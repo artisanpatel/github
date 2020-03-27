@@ -1,0 +1,352 @@
+{
+	"info": {
+		"_postman_id": "3443ce99-152b-4edd-9b7c-42c2c98cf2ba",
+		"name": "Github API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get authicated user list repository",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{gitToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.github.com/user/repos\n",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"user",
+						"repos\n"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Repo - test-Repository",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b1c86bd4-1e46-49f9-a4ca-948630272fa6",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"console.log(\"successfully created repo\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{gitToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\n\t\"name\": \"test-repository\" ,\n\t\"description\" : \"This is a test repository created by postman\",\n\t\"visibility\" : \"public\",\n\t\"private\" : false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.github.com/user/repos",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"user",
+						"repos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve new created repo-TestRepository",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bd6500df-f57a-4e7f-a196-985440b4c1a8",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{gitToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.github.com/repos/:owner/:repo",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "artisanpatel"
+						},
+						{
+							"key": "repo",
+							"value": "test-repository"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Issue - Found-bug",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f20a74bc-78e1-435f-acd5-ce5553f6a496",
+						"exec": [
+							"",
+							"pm.test(\"Status code expected 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"console.log(\"successfully created issue\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{gitToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\n\t\"name\": \"test-repository\" ,\n\t\"title\" : \"Found-bug\",\n\t\"description\" : \"This issue has been automatically created by Postman.\",\n\t\"visibility\" : \"public\",\n\t\"private\" : false,\n\t\"has_issues\" : true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.github.com/repos/:owner/:repo/issues",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo",
+						"issues"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "artisanpatel"
+						},
+						{
+							"key": "repo",
+							"value": "test-repository"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve issue created - Found a bug",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "97b87a98-b9b4-4d31-9b9e-f9f3b24b38ac",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"",
+							"pm.test(\"validate issue title\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Found-bug\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{gitToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.github.com/repos/:owner/:repo/issues ",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo",
+						"issues "
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "artisanpatel"
+						},
+						{
+							"key": "repo",
+							"value": "test-repository"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Repo - test-repository",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "63ee452e-7e71-4dfe-8eb0-d7838fe1da92",
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{gitToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://api.github.com/repos/:owner/:repo",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "artisanpatel"
+						},
+						{
+							"key": "repo",
+							"value": "test-repository"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
