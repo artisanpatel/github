@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "3443ce99-152b-4edd-9b7c-42c2c98cf2ba",
-		"name": "Github API",
+		"name": "Github-API-without-2F-authentication",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
