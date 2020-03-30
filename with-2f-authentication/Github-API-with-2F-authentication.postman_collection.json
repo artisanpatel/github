@@ -1,0 +1,548 @@
+{
+	"info": {
+		"_postman_id": "7b5c6c3f-42f4-443a-b51d-cdd05972b769",
+		"name": "Github-API-with-2F-authentication",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Trigger OTP code",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{gitpassword}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{gitusername}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "https://api.github.com/authorizations",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"authorizations"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get SMS from twilio Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f2f79ba4-af86-4d83-a130-1c1695af66d1",
+						"exec": [
+							"const response = pm.response.json();",
+							"const otp = response.messages[0].body.substring(0,6);",
+							"pm.globals.set(\"otpcode\", otp);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{AuthToken}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{AccountSid}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.twilio.com/2010-04-01/Accounts/{{AccountSid}}/Messages.json\n",
+					"protocol": "https",
+					"host": [
+						"api",
+						"twilio",
+						"com"
+					],
+					"path": [
+						"2010-04-01",
+						"Accounts",
+						"{{AccountSid}}",
+						"Messages.json\n"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Repo - test-Repository",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b1c86bd4-1e46-49f9-a4ca-948630272fa6",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"console.log(\"successfully created repo\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{gitToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-Github-OTP",
+						"value": "{{otpcode}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\n\t\"name\": \"test-repository\" ,\n\t\"description\" : \"This is a test repository created by postman\",\n\t\"visibility\" : \"public\",\n\t\"private\" : false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.github.com/user/repos",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"user",
+						"repos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve new created repo-TestRepository Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bd6500df-f57a-4e7f-a196-985440b4c1a8",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{gitToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.github.com/repos/:owner/:repo",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "artisanpatel"
+						},
+						{
+							"key": "repo",
+							"value": "test-repository"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Issue - Found-bug",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f20a74bc-78e1-435f-acd5-ce5553f6a496",
+						"exec": [
+							"",
+							"",
+							"var response = pm.response.json();",
+							"pm.globals.set(\"issuenumber\", response.number);",
+							"console.log(\"issue number \" + response.number );",
+							"console.log(\"successfully created issue\");",
+							"",
+							"pm.test(\"Status code expected 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{gitToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\n\t\"name\": \"test-repository\" ,\n\t\"title\" : \"Found-bug\",\n\t\"description\" : \"This issue has been automatically created by Postman.\",\n\t\"visibility\" : \"public\",\n\t\"private\" : false,\n\t\"has_issues\" : true\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.github.com/repos/:owner/:repo/issues",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo",
+						"issues"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "artisanpatel"
+						},
+						{
+							"key": "repo",
+							"value": "test-repository"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create auto Issue comment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f20a74bc-78e1-435f-acd5-ce5553f6a496",
+						"exec": [
+							"",
+							"pm.test(\"Status code expected 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{gitToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\n\t\"body\" : \"Thank you for reporting this issues.I will look into it as soon as possible.\"\n\t\n\t\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.github.com/repos/:owner/:repo/issues/:issue_number/comments \n",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo",
+						"issues",
+						":issue_number",
+						"comments \n"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "{{gitusername}}"
+						},
+						{
+							"key": "repo",
+							"value": "test-repository"
+						},
+						{
+							"key": "issue_number",
+							"value": "{{issuenumber}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve issue created - Found a bug Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "97b87a98-b9b4-4d31-9b9e-f9f3b24b38ac",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"",
+							"pm.test(\"validate issue title\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Found-bug\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{gitToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.github.com/repos/:owner/:repo/issues ",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo",
+						"issues "
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "artisanpatel"
+						},
+						{
+							"key": "repo",
+							"value": "test-repository"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Repo - test-repository",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "63ee452e-7e71-4dfe-8eb0-d7838fe1da92",
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {",
+							"    pm.response.to.have.status(204);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{gitToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "https://api.github.com/repos/:owner/:repo",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						":owner",
+						":repo"
+					],
+					"variable": [
+						{
+							"key": "owner",
+							"value": "artisanpatel"
+						},
+						{
+							"key": "repo",
+							"value": "test-repository"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "46c43a79-35d2-4f47-8023-987f8994d26e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "76f42d62-b74d-4c04-a0c8-7045b011764e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "d4697d43-4ca5-4b22-9bba-8a32eaa3323c",
+			"key": "gitToken",
+			"value": "enteryourtoken",
+			"type": "string"
+		},
+		{
+			"id": "e1ca0800-2793-44cb-9fe2-af5318d792b1",
+			"key": "gitusername",
+			"value": "enteryourusername",
+			"type": "string"
+		},
+		{
+			"id": "5e17ad4d-bf57-4d9a-91ff-3ff3f44ac64e",
+			"key": "gitpassword",
+			"value": "enteryourpassword",
+			"type": "string"
+		},
+		{
+			"id": "02080d82-55db-4bcf-b68b-c60f0ae61bed",
+			"key": "AccountSid",
+			"value": "enteryouraccountsid",
+			"type": "string"
+		},
+		{
+			"id": "5c39c332-e36c-4dee-81df-fbc981c0b7af",
+			"key": "AuthToken",
+			"value": "enteryourauthtoken",
+			"type": "string"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
